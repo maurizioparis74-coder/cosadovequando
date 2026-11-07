@@ -64,6 +64,23 @@ section.day{padding-block:14px 6px}
 .badge.ultimi{background:var(--corallo);color:#fff}
 .badge.conf{background:transparent;border:1px dashed var(--muted);color:var(--muted)}
 .extra{grid-column:2;font-size:14px;min-width:0}
+.ev{cursor:pointer;text-align:left}
+.ev:focus-visible{outline:3px solid var(--giallo);outline-offset:2px}
+.ev[aria-expanded="true"]{border-color:var(--corallo);box-shadow:0 2px 0 var(--corallo)}
+.more{margin-left:auto;font-size:13px;font-weight:700;color:var(--corallo-scuro);align-self:center}
+.more::after{content:" ›"}
+.ev[aria-expanded="true"] .more::after{content:" ˅"}
+.det{grid-column:1 / -1;border-top:1px dashed var(--line);margin-top:8px;padding-top:12px;display:flex;flex-direction:column;gap:12px;cursor:auto}
+.det dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0;font-size:15px}
+.det dt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.det dd{margin:0;min-width:0}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.act{font-family:var(--display);font-weight:700;font-size:15px;text-decoration:none;border-radius:999px;padding:9px 16px;border:1.5px solid var(--line);color:var(--fg);background:var(--bg)}
+.act.primary{background:var(--corallo);border-color:var(--corallo);color:#fff}
+.act:focus-visible{outline:3px solid var(--giallo);outline-offset:2px}
+.warn{margin:0;font-size:13px;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted)}
+@media (max-width:480px){.det dl{grid-template-columns:1fr}.det dt{padding-top:6px}.act{flex:1 1 auto;text-align:center}}
 .extra a{color:var(--corallo-scuro)}
 .empty{padding:40px 0;text-align:center;color:var(--muted)}
 footer{margin-top:28px;border-top:1px solid var(--line)}
@@ -106,11 +123,13 @@ footer .wrap{padding-block:18px 28px;font-size:13px;color:var(--muted);display:f
     <div class="row"><input type="search" id="q" placeholder="Cerca un evento, un paese, un luogo…" aria-label="Cerca"></div>
   </div>
   <div class="summary" id="summary" aria-live="polite"></div>
+  <div class="hint">Tocca un evento per vedere i dettagli, la mappa e il link all'organizzatore.</div>
   <div id="out"></div>
 </main>
 
 <footer><div class="wrap">
   <span>Organizzi un evento in Trentino? Segnalacelo a <a href="mailto:info@cosadovequando.it" style="color:inherit;font-weight:700">info@cosadovequando.it</a>: lo pubblichiamo citando sempre chi lo organizza. Per correzioni scrivi allo stesso indirizzo.</span>
+  <span>Contiamo in forma anonima quante volte vengono aperti gli eventi, per capire cosa interessa di più. Nessun dato personale, nessun cookie.</span>
   <span>Le informazioni vengono dagli organizzatori e dai siti ufficiali. Orari e date possono cambiare: verificale sempre prima di partire.</span>
 </div></footer>
 
@@ -208,7 +227,29 @@ function windowRange(){
   return [wd>=5?start:fri, sun];
 }
 
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shown = [];
+const fmtL = new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function ymd(x){return iso(x).replace(/-/g,'')}
+function mapsUrl(e){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([e.l,e.co,'Trentino'].filter(Boolean).join(', '))}
+function calUrl(e){
+  const det=[e.n, e.o?('Orari: '+e.o):'', e.u?('Info: '+e.u):'', 'Da cosadovequando.it/trentino'].filter(Boolean).join('\n');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(e.t)
+    +'&dates='+ymd(e.s)+'/'+ymd(add(e.e,1))+'&location='+encodeURIComponent([e.l,e.co].filter(Boolean).join(', '))
+    +'&details='+encodeURIComponent(det);
+}
+// Statistiche anonime: nessun dato personale, nessun cookie. Ogni azione diventa una riga nel foglio "Click".
+function track(e, azione, dest){
+  if(!e || !e.id) return;
+  try{
+    const body = JSON.stringify({t:'trentino', id:e.id, titolo:e.t, azione:azione, dest:dest||'', vista:state.win});
+    if(navigator.sendBeacon) navigator.sendBeacon(FEED, new Blob([body],{type:'text/plain;charset=utf-8'}));
+    else fetch(FEED,{method:'POST',mode:'no-cors',body:body,keepalive:true});
+  }catch(_){}
+}
+
 function card(e,from,to,day){
+  const i = shown.push(e)-1;
   const multi = +e.s!==+e.e;
   const badges=[];
   if(multi && day && +e.s===+day) badges.push('<span class="badge apre">Apre oggi</span>');
@@ -217,12 +258,27 @@ function card(e,from,to,day){
   if(e.cf) badges.push('<span class="badge conf">Da confermare</span>');
   else if(!e.o) badges.push('<span class="badge conf">Orari da confermare</span>');
   const col = `var(${CAT[e.c].col})`;
-  return `<article class="ev">
+  const quando = multi ? 'Dal '+fmtL.format(e.s)+' al '+fmtL.format(e.e) : fmtL.format(e.s);
+  return `<article class="ev" data-i="${i}" role="button" tabindex="0" aria-expanded="false" aria-controls="det-${i}">
     <svg class="pin" viewBox="0 0 36 48" aria-hidden="true"><path d="M18 47 C8 35 0 27 0 18 A18 18 0 1 1 36 18 C36 27 28 35 18 47 Z" fill="${col}"/><circle cx="18" cy="18" r="6" fill="var(--card)"/></svg>
-    <h3>${e.t}</h3>
-    <div class="meta"><b>${e.co}</b> · ${e.l}${e.o?' · '+e.o:''} <span class="sr">· ${CAT[e.c].nome}</span></div>
-    <div class="badges">${badges.join('')}</div>
-    ${(e.n||e.u)?`<div class="extra">${e.n?e.n+' ':''}${e.u?`<a href="${e.u}" target="_blank" rel="noopener">Fonte</a>`:''}</div>`:''}
+    <h3>${esc(e.t)}</h3>
+    <div class="meta"><b>${esc(e.co)}</b> · ${esc(e.l)}${e.o?' · '+esc(e.o):''} <span class="sr">· ${CAT[e.c].nome}</span></div>
+    <div class="badges">${badges.join('')}<span class="more" aria-hidden="true">Dettagli</span></div>
+    <div class="det" id="det-${i}" hidden>
+      <dl>
+        <dt>Quando</dt><dd>${quando}</dd>
+        <dt>Orari</dt><dd>${e.o?esc(e.o):'Da confermare: controlla la pagina dell\'evento'}</dd>
+        <dt>Dove</dt><dd>${esc(e.l)}, ${esc(e.co)}</dd>
+        <dt>Cosa</dt><dd>${CAT[e.c].nome}</dd>
+        ${e.n?`<dt>Info</dt><dd>${esc(e.n)}</dd>`:''}
+      </dl>
+      <div class="acts">
+        ${e.u?`<a class="act primary" data-act="fonte" href="${esc(e.u)}" target="_blank" rel="noopener">Vedi l'evento</a>`:''}
+        <a class="act" data-act="mappa" href="${mapsUrl(e)}" target="_blank" rel="noopener">Come arrivare</a>
+        <a class="act" data-act="calendario" href="${calUrl(e)}" target="_blank" rel="noopener">Aggiungi al calendario</a>
+      </div>
+      ${e.cf?'<p class="warn">Alcuni dettagli sono ancora da confermare: verifica sempre sulla pagina dell\'organizzatore.</p>':''}
+    </div>
   </article>`;
 }
 
@@ -233,6 +289,7 @@ function render(){
     && (!state.zona || e.z===state.zona)
     && (!state.q || (e.t+' '+e.co+' '+e.l+' '+e.n).toLowerCase().includes(state.q));
   const sel = EV.filter(match);
+  shown.length = 0;
   const days=[]; for(let x=new Date(from); x<=to; x=add(x,1)) days.push(new Date(x));
   let html='';
   // eventi di un giorno e aperture, per giorno
@@ -255,9 +312,30 @@ function render(){
 }
 render();
 
+// Apertura dei dettagli: tutto il riquadro è cliccabile; i pulsanti dentro aprono la destinazione
+const outEl = document.getElementById('out');
+function toggle(card){
+  const det = card.querySelector('.det');
+  const open = card.getAttribute('aria-expanded')!=='true';
+  card.setAttribute('aria-expanded', open);
+  det.hidden = !open;
+  if(open) track(shown[+card.dataset.i], 'dettagli');
+}
+outEl.addEventListener('click', ev=>{
+  const a = ev.target.closest('a.act');
+  const card = ev.target.closest('.ev');
+  if(!card) return;
+  if(a){ track(shown[+card.dataset.i], a.dataset.act, a.href); return; }
+  if(window.getSelection && String(window.getSelection()).length) return;
+  toggle(card);
+});
+outEl.addEventListener('keydown', ev=>{
+  if((ev.key==='Enter'||ev.key===' ') && ev.target.classList && ev.target.classList.contains('ev')){ ev.preventDefault(); toggle(ev.target); }
+});
+
 fetch(FEED).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{
   if(!j || !Array.isArray(j.eventi) || !j.eventi.length) return;
-  EV = j.eventi.map(x=>({t:x.titolo, c:CATKEY[(x.categoria||'').toLowerCase()]||'cultura', l:x.luogo, co:x.comune,
+  EV = j.eventi.map(x=>({id:x.id, t:x.titolo, c:CATKEY[(x.categoria||'').toLowerCase()]||'cultura', l:x.luogo, co:x.comune,
     z:x.zona, s:d(x.inizio), e:d(x.fine||x.inizio), o:x.orari, n:x.nota, u:x.link, cf:!!x.daConfermare}));
   const [g,o]=(j.aggiornato||'').split('T');
   if(g){const dt=d(g);document.querySelector('.note .wrap').textContent='Eventi aggiornati al '+fmtG.format(dt)+(o?' alle '+o:'');}
