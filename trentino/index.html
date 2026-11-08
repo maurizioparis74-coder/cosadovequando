@@ -278,6 +278,11 @@ function card(e,from,to,day){
   </article>`;
 }
 
+// Ordine casuale degli eventi dello stesso giorno: nessun evento è favorito.
+// Si estrae una volta per visita, così l'ordine non cambia mentre si usano i filtri.
+const RK = new Map();
+function rk(e){ const k=e.id||e.t; if(!RK.has(k)) RK.set(k, Math.random()); return RK.get(k); }
+
 function render(){
   const [from,to]=windowRange();
   const match = e => e.e>=from && e.s<=to
@@ -293,13 +298,15 @@ function render(){
   days.forEach(day=>{
     const items = sel.filter(e=> +e.s===+day || (+e.s===+e.e && +e.s===+day));
     if(!items.length) return;
-    items.sort((a,b)=>(a.o||'99').localeCompare(b.o||'99'));
+    items.sort((a,b)=>rk(a)-rk(b));
     items.forEach(e=>used.add(e));
     html+=`<section class="day"><div class="dayhead"><h2>${fmtG.format(day)}</h2><span>${items.length} ${items.length===1?'evento':'eventi'}</span></div><div class="list">${items.map(e=>card(e,from,to,day)).join('')}</div></section>`;
   });
   const running = sel.filter(e=>!used.has(e));
   if(running.length){
-    running.sort((a,b)=>a.e-b.e);
+    // prima quelli che chiudono nel periodo (ultimo giorno), poi gli altri in ordine casuale
+    const chiude = e => e.e<=to ? 0 : 1;
+    running.sort((a,b)=>chiude(a)-chiude(b) || (chiude(a)===0 ? a.e-b.e : rk(a)-rk(b)));
     html+=`<section class="day"><div class="dayhead"><h2>In corso nel periodo</h2><span>mercatini, mostre e rassegne già aperti</span></div><div class="list">${running.map(e=>card(e,from,to,null)).join('')}</div></section>`;
   }
   document.getElementById('out').innerHTML = html || '<p class="empty">Nessun evento per questi filtri. Prova un altro periodo o un\'altra zona.</p>';
