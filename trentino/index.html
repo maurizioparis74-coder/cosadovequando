@@ -286,7 +286,7 @@ function card(e,from,to,day){
   const i = shown.push(e)-1;
   const multi = +e.s!==+e.e;
   const badges=[];
-  if(multi && day && +e.s===+day) badges.push('<span class="badge apre">Apre oggi</span>');
+  if(multi && day && +e.s===+day) badges.push('<span class="badge apre">'+(+day===+today?'Apre oggi':'Apre')+'</span>');
   if(multi && e.e>=from && e.e<=to && +e.s!==+e.e) badges.push('<span class="badge ultimi">Ultimo giorno '+fmtB.format(e.e)+'</span>');
   if(multi) badges.push('<span class="badge">'+fmtB.format(e.s)+' – '+fmtB.format(e.e)+'</span>');
   if(e.cf) badges.push('<span class="badge conf">Da confermare</span>');
