@@ -17,7 +17,8 @@
   --bg:#FFFAF3; --card:#FFFFFF; --fg:#2A1712; --muted:#7A5C52; --line:#EEDFD0; --chip:#F7E9DA;
   --sagre:#C98A0C; --cultura:#3B6FB6; --concerti:#7A4BC9; --natura:#3E8A6E;
   --display:'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
-  --body:'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  /* testo: carattere di sistema (San Francisco su iPhone, Roboto su Android): più leggibile sul telefono e senza lo zero barrato */
+  --body:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#1D1210; --card:#2A1B17; --fg:#FFF4E6; --muted:#C9AFA4; --line:#3D2A24; --chip:#3A2721;
@@ -86,6 +87,24 @@ footer{margin-top:28px;border-top:1px solid var(--line)}
 footer .wrap{padding-block:18px 28px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
 @media (max-width:480px){.ev h3{font-size:17px}.dayhead h2{font-size:20px}}
 @media (prefers-reduced-motion:no-preference){.ev{transition:transform .15s}.ev:hover{transform:translateY(-1px)}}
+/* Telefono: testata compatta e filtri su una riga scorrevole, così gli eventi si vedono subito */
+@media (max-width:600px){
+  header .wrap{padding-block:12px 12px;gap:12px;flex-wrap:nowrap}
+  .logo{width:44px;height:38px;border-radius:12px;padding:6px 7px}
+  .brand{flex-direction:row;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .brand .eyebrow{font-size:16px!important}
+  h1{font-size:26px}
+  .tag{display:none}
+  .note .wrap{padding-block:5px;font-size:12px}
+  .controls{gap:8px;padding-block:12px 4px}
+  .row.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-inline:-16px;padding-inline:16px;padding-block:2px}
+  .row.scroll::-webkit-scrollbar{display:none}
+  .row.scroll .pill{flex:none;font-size:15px;padding:7px 14px}
+  .row.scroll .lbl{flex:none;min-width:52px}
+  .searchrow{flex-wrap:nowrap}
+  .searchrow input[type=date]{flex:none;width:9.5em}
+  .hint{display:none}
+}
 </style>
 
 <header class="band">
@@ -106,17 +125,16 @@ footer .wrap{padding-block:18px 28px;font-size:13px;color:var(--muted);display:f
 
 <main class="wrap">
   <div class="controls">
-    <div class="row" role="group" aria-label="Periodo">
+    <div class="row scroll" role="group" aria-label="Periodo">
       <span class="lbl">Quando</span>
       <button class="pill" data-win="oggi" aria-pressed="false" id="w-oggi">Oggi</button>
       <button class="pill" data-win="weekend" aria-pressed="true" id="w-weekend">Questo weekend</button>
       <button class="pill" data-win="7" aria-pressed="false" id="w-7">Prossimi 7 giorni</button>
       <button class="pill" data-win="30" aria-pressed="false" id="w-30">Prossimi 30 giorni</button>
-      <label class="row" style="gap:6px;margin-left:auto"><span class="lbl" style="margin:0">dal</span><input type="date" id="dal"></label>
     </div>
-    <div class="row" role="group" aria-label="Categoria" id="cats"><span class="lbl">Cosa</span></div>
-    <div class="row" role="group" aria-label="Zona" id="zone"><span class="lbl">Dove</span></div>
-    <div class="row"><input type="search" id="q" placeholder="Cerca un evento, un paese, un luogo…" aria-label="Cerca"></div>
+    <div class="row scroll" role="group" aria-label="Categoria" id="cats"><span class="lbl">Cosa</span></div>
+    <div class="row scroll" role="group" aria-label="Zona" id="zone"><span class="lbl">Dove</span></div>
+    <div class="row searchrow"><input type="search" id="q" placeholder="Cerca evento o paese" aria-label="Cerca"><label class="row" style="gap:6px;flex-wrap:nowrap"><span class="lbl" style="margin:0">dal</span><input type="date" id="dal" aria-label="A partire dal giorno"></label></div>
   </div>
   <div class="summary" id="summary" aria-live="polite"></div>
   <div class="hint">Tocca un evento per vedere i dettagli, la mappa e il link all'organizzatore.</div>
