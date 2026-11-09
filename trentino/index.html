@@ -84,7 +84,16 @@ section.day{padding-block:14px 6px}
 .extra a{color:var(--corallo-scuro)}
 .empty{padding:40px 0;text-align:center;color:var(--muted)}
 footer{margin-top:28px;border-top:1px solid var(--line)}
-footer .wrap{padding-block:18px 28px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+footer .wrap{padding-block:22px 28px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
+footer .org{background:var(--corallo);color:#fff;border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:8px}
+footer .org h2{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1;margin:0;color:#fff}
+footer .org p{margin:0;font-size:16px;color:#FFF4E6}
+footer .org .act.primary{background:#FFF4E6;border-color:#FFF4E6;color:var(--scuro);font-size:16px;padding:11px 20px}
+footer .org .small{font-size:14px;color:#FFE1C7}
+footer .org .small a{color:#fff;font-weight:700}
+footer .fine{margin:0}
+footer .priv{margin:6px 0 0;text-align:center}
+footer .priv a{color:var(--muted);font-weight:700}
 @media (max-width:480px){.ev h3{font-size:17px}.dayhead h2{font-size:20px}}
 @media (prefers-reduced-motion:no-preference){.ev{transition:transform .15s}.ev:hover{transform:translateY(-1px)}}
 /* Telefono: testata compatta e filtri su una riga scorrevole, così gli eventi si vedono subito */
@@ -162,9 +171,15 @@ footer .wrap{padding-block:18px 28px;font-size:13px;color:var(--muted);display:f
 </main>
 
 <footer><div class="wrap">
-  <span>Organizzi un evento in Trentino? Segnalacelo a <a href="mailto:info@cosadovequando.it" style="color:inherit;font-weight:700">info@cosadovequando.it</a>: lo pubblichiamo citando sempre chi lo organizza. Per correzioni scrivi allo stesso indirizzo.</span>
-  <span>Contiamo in forma anonima quante volte vengono aperti gli eventi, per capire cosa interessa di più. Nessun dato personale, nessun cookie. <a href="/privacy/" style="color:inherit;font-weight:700">Informativa privacy</a></span>
-  <span>Le informazioni vengono dagli organizzatori e dai siti ufficiali. Orari e date possono cambiare: verificale sempre prima di partire.</span>
+  <section class="org" aria-labelledby="org-t">
+    <h2 id="org-t">Organizzi un evento in Trentino?</h2>
+    <p>Segnalacelo: lo pubblichiamo gratis, citando sempre chi lo organizza.</p>
+    <a class="act primary" href="mailto:info@cosadovequando.it?subject=Segnalazione%20evento">Segnala il tuo evento</a>
+    <p class="small">oppure scrivi a <a href="mailto:info@cosadovequando.it">info@cosadovequando.it</a>, anche per correzioni.</p>
+  </section>
+  <p class="fine">Le informazioni vengono dagli organizzatori e dai siti ufficiali. Orari e date possono cambiare: verificale sempre prima di partire.</p>
+  <p class="fine">Questo sito non raccoglie dati personali e non fa alcuna profilazione.</p>
+  <p class="priv"><a href="/privacy/">Informativa privacy</a></p>
 </div></footer>
 
 <script>
