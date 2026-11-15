@@ -160,7 +160,7 @@ footer .priv a{color:var(--muted);font-weight:700}
     <div class="row scroll" role="group" aria-label="Zona" id="zone"><span class="lbl">Dove</span></div>
     <div class="selects">
       <label><span class="lbl">Quando</span><select id="s-win" aria-label="Periodo">
-        <option value="oggi">Oggi</option><option value="weekend" selected>Weekend</option><option value="7">7 giorni</option><option value="30">30 giorni</option></select></label>
+        <option value="giorno" hidden>Giorno scelto</option><option value="oggi">Oggi</option><option value="weekend" selected>Weekend</option><option value="7">7 giorni</option><option value="30">30 giorni</option></select></label>
       <label><span class="lbl">Cosa</span><select id="s-cat" aria-label="Categoria"><option value="">Tutte</option></select></label>
       <label><span class="lbl">Dove</span><select id="s-zona" aria-label="Zona"><option value="0">Ovunque</option></select></label>
     </div>
@@ -261,13 +261,19 @@ const zoneEl = document.getElementById('zone');
   zoneEl.appendChild(b);
 });
 document.querySelectorAll('[data-win]').forEach(b=>b.onclick=()=>{
-  state.win=b.dataset.win;document.querySelectorAll('[data-win]').forEach(p=>p.setAttribute('aria-pressed',p===b));render()});
-dal.onchange=render;
+  state.win=b.dataset.win;if(state.win==='oggi')dal.value=iso(today);document.querySelectorAll('[data-win]').forEach(p=>p.setAttribute('aria-pressed',p===b));render()});
+dal.onchange=()=>{
+  // una data scelta a mano: «Oggi» diventa «quel giorno», così premendo di nuovo Oggi si torna alla data di oggi
+  if(state.win==='oggi' && dal.value!==iso(today)){
+    state.win='giorno';document.querySelectorAll('[data-win]').forEach(p=>p.setAttribute('aria-pressed','false'));
+    const sw=document.getElementById('s-win');if(sw)sw.value='giorno';
+  }
+  render()};
 document.getElementById('q').oninput=e=>{state.q=e.target.value.trim().toLowerCase();render()};
 
 function windowRange(){
   const start = dal.value ? d(dal.value) : today;
-  if(state.win==='oggi') return [start,start];
+  if(state.win==='oggi'||state.win==='giorno') return [start,start];
   if(state.win==='7') return [start,add(start,6)];
   if(state.win==='30') return [start,add(start,29)];
   // weekend: dal venerdì alla domenica della settimana di "start" (se è già domenica, quella)
