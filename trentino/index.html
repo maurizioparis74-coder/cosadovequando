@@ -54,7 +54,8 @@ section.day{padding-block:14px 6px}
 .dayhead span{color:var(--muted);font-size:14px}
 .list{display:flex;flex-direction:column;gap:10px}
 .ev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
-.pin{grid-row:1 / span 3;width:22px;height:30px;margin-top:2px}
+.pin{grid-row:1 / span 4;width:22px;height:30px;margin-top:2px}
+.ev .cat{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.2;margin-top:1px}
 .ev h3{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.25;margin:0;min-width:0;text-wrap:balance}
 .meta{color:var(--muted);font-size:14px;min-width:0}
 .meta b{color:var(--fg);font-weight:700}
@@ -311,8 +312,9 @@ function card(e,from,to,day){
   const quando = multi ? 'Dal '+fmtL.format(e.s)+' al '+fmtL.format(e.e) : fmtL.format(e.s);
   return `<article class="ev" data-i="${i}" role="button" tabindex="0" aria-expanded="false" aria-controls="det-${i}">
     <svg class="pin" viewBox="0 0 36 48" aria-hidden="true"><path d="M18 47 C8 35 0 27 0 18 A18 18 0 1 1 36 18 C36 27 28 35 18 47 Z" fill="${col}"/><circle cx="18" cy="18" r="6" fill="var(--card)"/></svg>
+    <div class="cat" style="color:${col}">${CAT[e.c].nome}</div>
     <h3>${esc(e.t)}</h3>
-    <div class="meta"><b>${esc(e.co)}</b> · ${esc(e.l)}${e.o?' · '+esc(e.o):''} <span class="sr">· ${CAT[e.c].nome}</span></div>
+    <div class="meta"><b>${esc(e.co)}</b> · ${esc(e.l)}${e.o?' · '+esc(e.o):''}</div>
     <div class="badges">${badges.join('')}<span class="more" aria-hidden="true">Dettagli</span></div>
     <div class="det" id="det-${i}" hidden>
       <dl>
