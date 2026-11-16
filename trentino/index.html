@@ -404,7 +404,7 @@ outEl.addEventListener('keydown', ev=>{
 fetch(FEED).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{
   if(!j || !Array.isArray(j.eventi) || !j.eventi.length) return;
   EV = j.eventi.map(x=>({id:x.id, t:x.titolo, c:CATKEY[(x.categoria||'').toLowerCase()]||'cultura', l:x.luogo, co:x.comune,
-    z:x.zona, s:d(x.inizio), e:d(x.fine||x.inizio), o:x.orari, n:x.nota, u:x.link, cf:!!x.daConfermare}));
+    z:x.zona, s:d(x.inizio), e:d(x.fine||x.inizio), o:x.orari, n:x.nota, u:((x.link||'').match(/https?:\/\/[^\s·]+/)||[''])[0], cf:!!x.daConfermare}));
   const [g,o]=(j.aggiornato||'').split('T');
   if(g){const dt=d(g);document.querySelector('.note .wrap').textContent='Eventi aggiornati al '+fmtG.format(dt)+(o?' alle '+o:'');}
   buildCats(); state.cats.clear(); render();
