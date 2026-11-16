@@ -320,7 +320,7 @@ function card(e,from,to,day){
   if(multi && e.e>=from && e.e<=to && +e.s!==+e.e) badges.push('<span class="badge ultimi">Ultimo giorno '+fmtB.format(e.e)+'</span>');
   if(multi) badges.push('<span class="badge">'+fmtB.format(e.s)+' – '+fmtB.format(e.e)+'</span>');
   if(e.sg) badges.push('<span class="badge sg">Segnalato dall\'organizzatore</span>');
-  if(e.cf) badges.push('<span class="badge conf">Da confermare</span>');
+  if(e.cf) badges.push('<span class="badge conf">Informazioni non complete</span>');
   else if(!e.o) badges.push('<span class="badge conf">Orari da confermare</span>');
   const col = `var(${CAT[e.c].col})`;
   const quando = multi ? 'Dal '+fmtL.format(e.s)+' al '+fmtL.format(e.e) : fmtL.format(e.s);
@@ -345,7 +345,7 @@ function card(e,from,to,day){
         <a class="act" data-act="mappa" href="${mapsUrl(e)}" target="_blank" rel="noopener">Come arrivare</a>
         <a class="act" data-act="calendario" href="${calUrl(e)}" target="_blank" rel="noopener">Aggiungi al calendario</a>
       </div>
-      ${e.cf?'<p class="warn">Alcuni dettagli sono ancora da confermare: verifica sempre sulla pagina dell\'organizzatore.</p>':''}
+      ${e.cf?'<p class="warn">Informazioni non complete: verifica sempre sulla pagina dell\'organizzatore prima di partire.</p>':''}
     </div>
   </article>`;
 }
