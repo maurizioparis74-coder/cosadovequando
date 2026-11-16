@@ -345,7 +345,7 @@ function card(e,from,to,day){
         <a class="act" data-act="mappa" href="${mapsUrl(e)}" target="_blank" rel="noopener">Come arrivare</a>
         <a class="act" data-act="calendario" href="${calUrl(e)}" target="_blank" rel="noopener">Aggiungi al calendario</a>
       </div>
-      ${e.cf?'<p class="warn">Informazioni non complete: verifica sempre sulla pagina dell\'organizzatore prima di partire.</p>':''}
+      ${e.cf?`<p class="warn"><b>Informazioni non complete${e.cm?': '+esc(e.cm)+' da confermare':''}.</b> Verifica sempre sulla pagina dell'organizzatore prima di partire.</p>`:''}
     </div>
   </article>`;
 }
@@ -411,7 +411,7 @@ outEl.addEventListener('keydown', ev=>{
 fetch(FEED).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{
   if(!j || !Array.isArray(j.eventi) || !j.eventi.length) return;
   EV = j.eventi.map(x=>({id:x.id, t:x.titolo, c:CATKEY[(x.categoria||'').toLowerCase()]||'cultura', l:x.luogo, co:x.comune,
-    z:x.zona, s:d(x.inizio), e:d(x.fine||x.inizio), o:x.orari, n:x.nota, u:((x.link||'').match(/https?:\/\/[^\s·]+/)||[''])[0], cf:!!x.daConfermare, img:/^https?:\/\//.test(x.locandina||'')?x.locandina:'', sg:!!x.segnalato}));
+    z:x.zona, s:d(x.inizio), e:d(x.fine||x.inizio), o:x.orari, n:x.nota, u:((x.link||'').match(/https?:\/\/[^\s·]+/)||[''])[0], cf:!!x.daConfermare, cm:x.cosaManca||'', img:/^https?:\/\//.test(x.locandina||'')?x.locandina:'', sg:!!x.segnalato}));
   const [g,o]=(j.aggiornato||'').split('T');
   if(g){const dt=d(g);document.querySelector('.note .wrap').textContent='Eventi aggiornati al '+fmtG.format(dt)+(o?' alle '+o:'');}
   buildCats(); state.cats.clear(); render();
