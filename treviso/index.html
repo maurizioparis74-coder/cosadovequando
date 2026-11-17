@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="description" content="Sagre, mercatini, teatro, concerti e mostre a Treviso e provincia: cosa fare oggi e nel weekend, aggiornato ogni giorno.">
+</head>
+<body>
+<title>CosaDoveQuando Treviso</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="/fonts.css">
+<style>
+/* Layout: banda corallo in testa con il marchio, poi una colonna unica di giorni (agenda), filtri a pillole che vanno a capo */
+:root{
+  --corallo:#C8452A; --corallo-scuro:#A8371F; --crema:#FFF4E6; --giallo:#F6C343; --scuro:#2A1712;
+  --bg:#FFFAF3; --card:#FFFFFF; --fg:#2A1712; --muted:#7A5C52; --line:#EEDFD0; --chip:#F7E9DA;
+  --sagre:#C98A0C; --cultura:#3B6FB6; --concerti:#7A4BC9; --natura:#3E8A6E; --benessere:#12707A;
+  --display:'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  /* testo: carattere di sistema (San Francisco su iPhone, Roboto su Android): più leggibile sul telefono e senza lo zero barrato */
+  --body:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1D1210; --card:#2A1B17; --fg:#FFF4E6; --muted:#C9AFA4; --line:#3D2A24; --chip:#3A2721;
+  --sagre:#F0B53A; --cultura:#7FA6E0; --concerti:#B394EA; --natura:#6FC2A0; --benessere:#5FB8C0; --corallo-scuro:#E07A60; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1D1210; --card:#2A1B17; --fg:#FFF4E6; --muted:#C9AFA4; --line:#3D2A24; --chip:#3A2721;
+  --sagre:#F0B53A; --cultura:#7FA6E0; --concerti:#B394EA; --natura:#6FC2A0; --benessere:#5FB8C0; --corallo-scuro:#E07A60; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+header.band{background:var(--corallo);color:var(--crema)}
+header .wrap{padding-block:28px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{width:62px;height:53px;flex:none;background:#FFF4E6;border-radius:18px;padding:10px 11px}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#FFE1C7}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,7vw,52px);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.tag{margin:6px 0 0;font-size:15px;color:#FFE9D6}
+.note{background:var(--chip);color:var(--muted);font-size:13px}
+.note .wrap{padding-block:8px}
+.controls{display:flex;flex-direction:column;gap:12px;padding-block:20px 8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.pill{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:6px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pill[aria-pressed="true"]{background:var(--corallo);border-color:var(--corallo);color:#fff}
+.pill:focus-visible,input:focus-visible{outline:3px solid var(--giallo);outline-offset:2px}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+input[type=date],input[type=search]{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:6px 10px}
+input[type=search]{flex:1;min-width:0}
+.summary{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted);padding-block:6px 4px}
+section.day{padding-block:14px 6px}
+.dayhead{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--fg);padding-bottom:6px;margin-bottom:10px}
+.dayhead h2{font-family:var(--display);font-weight:800;font-size:22px;margin:0;text-transform:capitalize}
+.dayhead span{color:var(--muted);font-size:14px}
+.list{display:flex;flex-direction:column;gap:10px}
+.ev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.pin{grid-row:1 / span 4;width:22px;height:30px;margin-top:2px}
+.ev.has-img{grid-template-columns:auto 1fr 72px}
+.thumb{grid-column:3;grid-row:1 / span 4;width:72px;height:96px;object-fit:cover;border-radius:8px;border:1px solid var(--line);align-self:start}
+.loc{display:block;max-width:100%;width:420px;height:auto;border-radius:10px;border:1px solid var(--line)}
+.badge.sg{background:var(--benessere);color:#fff}
+.ev .cat{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.2;margin-top:1px}
+.ev h3{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.25;margin:0;min-width:0;text-wrap:balance}
+.meta{color:var(--muted);font-size:14px;min-width:0}
+.meta b{color:var(--fg);font-weight:700}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;background:var(--chip);color:var(--fg)}
+.badge.apre{background:var(--giallo);color:var(--scuro)}
+.badge.ultimi{background:var(--corallo);color:#fff}
+.badge.conf{background:transparent;border:1px dashed var(--muted);color:var(--muted)}
+.extra{grid-column:2;font-size:14px;min-width:0}
+.ev{cursor:pointer;text-align:left}
+.ev:focus-visible{outline:3px solid var(--giallo);outline-offset:2px}
+.ev[aria-expanded="true"]{border-color:var(--corallo);box-shadow:0 2px 0 var(--corallo)}
+.more{margin-left:auto;font-size:13px;font-weight:700;color:var(--corallo-scuro);align-self:center}
+.more::after{content:" ›"}
+.ev[aria-expanded="true"] .more::after{content:" ˅"}
+.det{grid-column:1 / -1;border-top:1px dashed var(--line);margin-top:8px;padding-top:12px;display:flex;flex-direction:column;gap:12px;cursor:auto}
+.det dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0;font-size:15px}
+.det dt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.det dd{margin:0;min-width:0}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.act{font-family:var(--display);font-weight:700;font-size:15px;text-decoration:none;border-radius:999px;padding:9px 16px;border:1.5px solid var(--line);color:var(--fg);background:var(--bg)}
+.act.primary{background:var(--corallo);border-color:var(--corallo);color:#fff}
+.act:focus-visible{outline:3px solid var(--giallo);outline-offset:2px}
+.warn{margin:0;font-size:13px;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted)}
+@media (max-width:480px){.det dl{grid-template-columns:1fr}.det dt{padding-top:6px}.act{flex:1 1 auto;text-align:center}}
+.extra a{color:var(--corallo-scuro)}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+footer{margin-top:28px;border-top:1px solid var(--line)}
+footer .wrap{padding-block:22px 28px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
+footer .org{background:var(--corallo);color:#fff;border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:8px}
+footer .org h2{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1;margin:0;color:#fff}
+footer .org p{margin:0;font-size:16px;color:#FFF4E6}
+footer .org .act.primary{background:#FFF4E6;border-color:#FFF4E6;color:var(--scuro);font-size:16px;padding:11px 20px}
+footer .org .small{font-size:14px;color:#FFE1C7}
+footer .org .small a{color:#fff;font-weight:700}
+footer .fine{margin:0;text-align:center}
+footer .priv{margin:6px 0 0;text-align:center}
+footer .priv a{color:var(--muted);font-weight:700}
+@media (max-width:480px){.ev h3{font-size:17px}.dayhead h2{font-size:20px}}
+@media (prefers-reduced-motion:no-preference){.ev{transition:transform .15s}.ev:hover{transform:translateY(-1px)}}
+/* Telefono: testata compatta e filtri su una riga scorrevole, così gli eventi si vedono subito */
+@media (max-width:600px){
+  header .wrap{padding-block:12px 12px;gap:12px;flex-wrap:nowrap}
+  .logo{width:44px;height:38px;border-radius:12px;padding:6px 7px}
+  .brand{flex-direction:row;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .brand .eyebrow{font-size:16px!important}
+  h1{font-size:26px}
+  .tag{display:none}
+  .note .wrap{padding-block:5px;font-size:12px}
+  .controls{gap:8px;padding-block:12px 4px}
+  .row.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-inline:-16px;padding-inline:16px;padding-block:2px}
+  .row.scroll::-webkit-scrollbar{display:none}
+  .row.scroll .pill{flex:none;font-size:15px;padding:7px 14px}
+  .row.scroll .lbl{flex:none;min-width:52px}
+  .searchrow{flex-wrap:nowrap}
+  .searchrow input[type=date]{flex:none;width:9.5em}
+  .hint{display:none}
+}
+
+/* Sul telefono tre tendine affiancate al posto delle pillole */
+.selects{display:none}
+@media (max-width:600px){
+  .row.scroll{display:none}
+  .selects{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .selects label{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .selects .lbl{font-size:11px;margin:0}
+  .selects select{font:inherit;font-size:15px;font-weight:600;width:100%;min-width:0;appearance:none;-webkit-appearance:none;
+    border:1.5px solid var(--line);background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23C8452A' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 10px center;
+    color:var(--fg);border-radius:12px;padding:9px 28px 9px 10px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+  .selects select.on{border-color:var(--corallo);background-color:#FBE3DA}
+  .selects select:focus-visible{outline:3px solid var(--giallo);outline-offset:2px}
+}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <svg class="logo" viewBox="0 0 92 78" role="img" aria-label="Logo CosaDoveQuando">
+<g transform="translate(0 18)"><path d="M18 47 C8 35 0 27 0 18 A18 18 0 1 1 36 18 C36 27 28 35 18 47 Z" fill="#3B6FB6" transform="scale(1.25)"/><circle cx="22.5" cy="22.5" r="8" fill="#C8452A"/></g>
+<g transform="translate(46 18)"><path d="M18 47 C8 35 0 27 0 18 A18 18 0 1 1 36 18 C36 27 28 35 18 47 Z" fill="#7A4BC9" transform="scale(1.25)"/><circle cx="22.5" cy="22.5" r="8" fill="#C8452A"/></g>
+<g transform="translate(23 0)"><path d="M18 47 C8 35 0 27 0 18 A18 18 0 1 1 36 18 C36 27 28 35 18 47 Z" fill="#F6C343" transform="scale(1.25)"/><circle cx="22.5" cy="22.5" r="8" fill="#C8452A"/></g>
+</svg>
+    <div class="brand">
+      <a class="eyebrow" href="/" style="text-decoration:none;text-transform:none;letter-spacing:-.01em;font-size:20px;font-weight:800;color:#FFF4E6">cosadove<span style="color:#F6C343">quando</span></a>
+      <h1>Treviso</h1>
+      <p class="tag">Sagre, mercatini, teatro, concerti e mostre in città e in provincia</p>
+    </div>
+  </div>
+</header>
+<div class="note"><div class="wrap">Eventi a Treviso e provincia: caricamento in corso…</div></div>
+
+<main class="wrap">
+  <div class="controls">
+    <div class="row scroll" role="group" aria-label="Periodo">
+      <span class="lbl">Quando</span>
+      <button class="pill" data-win="oggi" aria-pressed="false" id="w-oggi">Oggi</button>
+      <button class="pill" data-win="weekend" aria-pressed="true" id="w-weekend">Questo weekend</button>
+      <button class="pill" data-win="7" aria-pressed="false" id="w-7">Prossimi 7 giorni</button>
+      <button class="pill" data-win="30" aria-pressed="false" id="w-30">Prossimi 30 giorni</button>
+    </div>
+    <div class="row scroll" role="group" aria-label="Categoria" id="cats"><span class="lbl">Cosa</span></div>
+    <div class="row scroll" role="group" aria-label="Zona" id="zone"><span class="lbl">Dove</span></div>
+    <div class="selects">
+      <label><span class="lbl">Quando</span><select id="s-win" aria-label="Periodo">
+        <option value="dal" hidden>Dal giorno scelto</option><option value="oggi">Oggi</option><option value="weekend" selected>Weekend</option><option value="7">7 giorni</option><option value="30">30 giorni</option></select></label>
+      <label><span class="lbl">Cosa</span><select id="s-cat" aria-label="Categoria"><option value="">Tutte</option></select></label>
+      <label><span class="lbl">Dove</span><select id="s-zona" aria-label="Zona"><option value="0">Ovunque</option></select></label>
+    </div>
+    <div class="row searchrow"><input type="search" id="q" placeholder="Cerca evento o paese" aria-label="Cerca"><label class="row" style="gap:6px;flex-wrap:nowrap"><span class="lbl" style="margin:0">dal</span><input type="date" id="dal" aria-label="A partire dal giorno"></label></div>
+  </div>
+  <div class="summary" id="summary" aria-live="polite"></div>
+  <div class="hint">Tocca un evento per vedere i dettagli, la mappa e il link all'organizzatore.</div>
+  <div id="out"></div>
+</main>
+
+<footer><div class="wrap">
+  <section class="org" aria-labelledby="org-t">
+    <h2 id="org-t">Organizzi un evento in provincia di Treviso?</h2>
+    <p>Segnalacelo: lo pubblichiamo gratis, citando sempre chi lo organizza.</p>
+    <a class="act primary" href="mailto:info@cosadovequando.it?subject=Segnalazione%20evento">Segnala il tuo evento</a>
+    <p class="small">oppure scrivi a <a href="mailto:info@cosadovequando.it">info@cosadovequando.it</a>, anche per correzioni.</p>
+  </section>
+  <p class="fine">Le informazioni vengono dagli organizzatori e dai siti ufficiali. Orari e date possono cambiare: verificale sempre prima di partire.</p>
+  <p class="fine">Questo sito non raccoglie dati personali e non fa alcuna profilazione.</p>
+  <p class="priv"><a href="/privacy/">Informativa privacy</a></p>
+</div></footer>
+
+<script>
+const CAT = {
+  sagre:{nome:'Sagre e feste', col:'--sagre'},
+  cultura:{nome:'Cultura e mostre', col:'--cultura'},
+  concerti:{nome:'Concerti e serate', col:'--concerti'},
+  natura:{nome:'Natura e aria aperta', col:'--natura'},
+  benessere:{nome:'Eventi benessere', col:'--benessere'}
+};
+const ZONE = ['Treviso città','Intorno a Treviso','Colline del Prosecco','Castellana e Asolano','Piave e Opitergino'];
+// Gli eventi arrivano dal feed (scheda «Eventi Treviso» del foglio); finché non arriva la lista resta vuota.
+let EV = [];
+
+// Feed in tempo reale dal foglio (script «Pubblica», parametro t=treviso).
+const FEED = 'https://script.google.com/macros/s/AKfycbxEksOq1c2qYgumxE-w7qQR-7aNdT56V29dovnlKqs7h3BnMgxw0MspzhJagWXKqGoTFA/exec?t=treviso';
+const CATKEY = {'sagre e feste':'sagre','cultura e mostre':'cultura','concerti e serate':'concerti','natura e sport':'natura','natura e aria aperta':'natura','benessere e corsi':'benessere','eventi benessere':'benessere','benessere':'benessere'};
+
+function d(s){const [y,m,g]=s.split('-').map(Number);return new Date(y,m-1,g,12)}
+function iso(x){return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+function add(x,n){const y=new Date(x);y.setDate(y.getDate()+n);return y}
+const fmtG = new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long'});
+const fmtB = new Intl.DateTimeFormat('it-IT',{day:'numeric',month:'short'});
+
+const state = {win:'weekend', cats:new Set(), zona:null, q:''};
+const today = d(iso(new Date()));
+const dal = document.getElementById('dal');
+dal.value = iso(today);
+
+// filtri categoria e zona
+const catsEl = document.getElementById('cats');
+function buildCats(){
+catsEl.querySelectorAll('.pill').forEach(p=>p.remove());
+Object.entries(CAT).forEach(([k,v])=>{
+  if(!EV.some(e=>e.c===k)) return;
+  const b=document.createElement('button');b.className='pill';b.id='c-'+k;b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<span class="dot" style="background:var(${v.col})"></span>${v.nome}`;
+  b.onclick=()=>{state.cats.has(k)?state.cats.delete(k):state.cats.add(k);b.setAttribute('aria-pressed',state.cats.has(k));render()};
+  catsEl.appendChild(b);
+});
+}
+buildCats();
+const zoneEl = document.getElementById('zone');
+['Tutta la provincia',...ZONE].forEach((z,i)=>{
+  const b=document.createElement('button');b.className='pill';b.id='z-'+i;b.textContent=z;b.setAttribute('aria-pressed',i===0);
+  b.onclick=()=>{state.zona=i===0?null:z;[...zoneEl.querySelectorAll('.pill')].forEach(p=>p.setAttribute('aria-pressed',p===b));render()};
+  zoneEl.appendChild(b);
+});
+document.querySelectorAll('[data-win]').forEach(b=>b.onclick=()=>{
+  state.win=b.dataset.win;dal.value=iso(today);document.querySelectorAll('[data-win]').forEach(p=>p.setAttribute('aria-pressed',p===b));render()});
+dal.onchange=()=>{
+  // una data scelta a mano: si vedono tutti gli eventi da quel giorno in poi e i pulsanti del periodo si spengono
+  state.win='dal';document.querySelectorAll('[data-win]').forEach(p=>p.setAttribute('aria-pressed','false'));
+  const sw=document.getElementById('s-win');if(sw)sw.value='dal';
+  render()};
+document.getElementById('q').oninput=e=>{state.q=e.target.value.trim().toLowerCase();render()};
+
+function windowRange(){
+  if(state.win==='dal'){
+    // dalla data scelta in poi: tutti gli eventi fino all'ultimo in calendario
+    const start = dal.value ? d(dal.value) : today;
+    const last = EV.reduce((m,e)=>e.e>m?e.e:m, start);
+    return [start,last];
+  }
+  const start = today;
+  if(state.win==='oggi') return [start,start];
+  if(state.win==='7') return [start,add(start,6)];
+  if(state.win==='30') return [start,add(start,29)];
+  // weekend: sabato e domenica; da lunedì a venerdì quelli successivi, di sabato sabato e domenica, di domenica solo oggi
+  const wd = start.getDay(); // 0 dom, 6 sab
+  if(wd===0) return [start,start];
+  const sat = add(start,6-wd);
+  return [sat, add(sat,1)];
+}
+
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shown = [];
+const fmtL = new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function ymd(x){return iso(x).replace(/-/g,'')}
+function mapsUrl(e){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([e.l,e.co,'Treviso'].filter(Boolean).join(', '))}
+function calUrl(e){
+  const det=[e.n, e.o?('Orari: '+e.o):'', e.u?('Info: '+e.u):'', 'Da cosadovequando.it/treviso'].filter(Boolean).join('\n');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(e.t)
+    +'&dates='+ymd(e.s)+'/'+ymd(add(e.e,1))+'&location='+encodeURIComponent([e.l,e.co].filter(Boolean).join(', '))
+    +'&details='+encodeURIComponent(det);
+}
+// Statistiche anonime: nessun dato personale, nessun cookie. Ogni azione diventa una riga nel foglio "Click".
+function track(e, azione, dest){
+  if(!e || !e.id) return;
+  try{
+    const body = JSON.stringify({t:'treviso', id:e.id, titolo:e.t, azione:azione, dest:dest||'', vista:state.win});
+    if(navigator.sendBeacon) navigator.sendBeacon(FEED.split('?')[0], new Blob([body],{type:'text/plain;charset=utf-8'}));
+    else fetch(FEED.split('?')[0],{method:'POST',mode:'no-cors',body:body,keepalive:true});
+  }catch(_){}
+}
+
+function card(e,from,to,day){
+  const i = shown.push(e)-1;
+  const multi = +e.s!==+e.e;
+  const badges=[];
+  if(multi && day && +e.s===+day) badges.push('<span class="badge apre">'+(+day===+today?'Apre oggi':'Apre')+'</span>');
+  if(multi && e.e>=from && e.e<=to && +e.s!==+e.e) badges.push('<span class="badge ultimi">Ultimo giorno '+fmtB.format(e.e)+'</span>');
+  if(multi) badges.push('<span class="badge">'+fmtB.format(e.s)+' – '+fmtB.format(e.e)+'</span>');
+  if(e.sg) badges.push('<span class="badge sg">Segnalato dall\'organizzatore</span>');
+  if(e.cf) badges.push('<span class="badge conf">Informazioni non complete</span>');
+  else if(!e.o) badges.push('<span class="badge conf">Orari da confermare</span>');
+  const col = `var(${CAT[e.c].col})`;
+  const quando = multi ? 'Dal '+fmtL.format(e.s)+' al '+fmtL.format(e.e) : fmtL.format(e.s);
+  return `<article class="ev${e.img?' has-img':''}" data-i="${i}" role="button" tabindex="0" aria-expanded="false" aria-controls="det-${i}">
+    <svg class="pin" viewBox="0 0 36 48" aria-hidden="true"><path d="M18 47 C8 35 0 27 0 18 A18 18 0 1 1 36 18 C36 27 28 35 18 47 Z" fill="${col}"/><circle cx="18" cy="18" r="6" fill="var(--card)"/></svg>
+    <div class="cat" style="color:${col}">${CAT[e.c].nome}</div>
+    ${e.img?`<img class="thumb" src="${esc(e.img)}" alt="" loading="lazy" aria-hidden="true">`:''}
+    <h3>${esc(e.t)}</h3>
+    <div class="meta"><b>${esc(e.co)}</b> · ${esc(e.l)}${e.o?' · '+esc(e.o):''}</div>
+    <div class="badges">${badges.join('')}<span class="more" aria-hidden="true">Dettagli</span></div>
+    <div class="det" id="det-${i}" hidden>
+      ${e.img?`<a href="${esc(e.img)}" target="_blank" rel="noopener" data-act="locandina"><img class="loc" src="${esc(e.img)}" alt="Locandina di ${esc(e.t)}" loading="lazy"></a>`:''}
+      <dl>
+        <dt>Quando</dt><dd>${quando}</dd>
+        <dt>Orari</dt><dd>${e.o?esc(e.o):'Da confermare: controlla la pagina dell\'evento'}</dd>
+        <dt>Dove</dt><dd>${esc(e.l)}, ${esc(e.co)}</dd>
+        <dt>Cosa</dt><dd>${CAT[e.c].nome}</dd>
+        ${e.n?`<dt>Info</dt><dd>${esc(e.n)}</dd>`:''}
+      </dl>
+      <div class="acts">
+        ${e.u?`<a class="act primary" data-act="fonte" href="${esc(e.u)}" target="_blank" rel="noopener">Vedi l'evento</a>`:''}
+        <a class="act" data-act="mappa" href="${mapsUrl(e)}" target="_blank" rel="noopener">Come arrivare</a>
+        <a class="act" data-act="calendario" href="${calUrl(e)}" target="_blank" rel="noopener">Aggiungi al calendario</a>
+      </div>
+      ${e.cf?`<p class="warn"><b>Informazioni non complete${e.cm?': '+esc(e.cm)+' da confermare':''}.</b> Verifica sempre sulla pagina dell'organizzatore prima di partire.</p>`:''}
+    </div>
+  </article>`;
+}
+
+// Ordine degli eventi dello stesso giorno: prima quelli segnalati dagli organizzatori, poi gli altri in ordine casuale.
+// Si estrae una volta per visita, così l'ordine non cambia mentre si usano i filtri.
+const RK = new Map();
+function rk(e){ const k=e.id||e.t; if(!RK.has(k)) RK.set(k, Math.random()); return RK.get(k); }
+
+function render(){
+  const [from,to]=windowRange();
+  const match = e => e.e>=from && e.s<=to
+    && (!state.cats.size || state.cats.has(e.c))
+    && (!state.zona || e.z===state.zona)
+    && (!state.q || (e.t+' '+e.co+' '+e.l+' '+e.n).toLowerCase().includes(state.q));
+  const sel = EV.filter(match);
+  shown.length = 0;
+  const days=[]; for(let x=new Date(from); x<=to; x=add(x,1)) days.push(new Date(x));
+  let html='';
+  // eventi di un giorno e aperture, per giorno
+  const used=new Set();
+  days.forEach(day=>{
+    const items = sel.filter(e=> +e.s===+day || (+e.s===+e.e && +e.s===+day));
+    if(!items.length) return;
+    items.sort((a,b)=>(!!b.sg-!!a.sg)||rk(a)-rk(b));
+    items.forEach(e=>used.add(e));
+    html+=`<section class="day"><div class="dayhead"><h2>${fmtG.format(day)}</h2><span>${items.length} ${items.length===1?'evento':'eventi'}</span></div><div class="list">${items.map(e=>card(e,from,to,day)).join('')}</div></section>`;
+  });
+  const running = sel.filter(e=>!used.has(e));
+  if(running.length){
+    // prima quelli che chiudono nel periodo (ultimo giorno), poi gli altri in ordine casuale
+    const chiude = e => e.e<=to ? 0 : 1;
+    running.sort((a,b)=>chiude(a)-chiude(b) || (!!b.sg-!!a.sg) || (chiude(a)===0 ? a.e-b.e : rk(a)-rk(b)));
+    html+=`<section class="day"><div class="dayhead"><h2>In corso nel periodo</h2><span>mercatini, mostre e rassegne già aperti</span></div><div class="list">${running.map(e=>card(e,from,to,null)).join('')}</div></section>`;
+  }
+  document.getElementById('out').innerHTML = html || (!EV.length ? '<p class="empty">Caricamento degli eventi…</p>' : '') || '<p class="empty">Nessun evento per questi filtri. Prova un altro periodo o un\'altra zona.</p>';
+  const per = +from===+to ? fmtG.format(from) : fmtB.format(from)+' – '+fmtB.format(to);
+  document.getElementById('summary').textContent = `${sel.length} ${sel.length===1?'evento':'eventi'} · ${per}`;
+}
+render();
+
+// Apertura dei dettagli: tutto il riquadro è cliccabile; i pulsanti dentro aprono la destinazione
+const outEl = document.getElementById('out');
+function toggle(card){
+  const det = card.querySelector('.det');
+  const open = card.getAttribute('aria-expanded')!=='true';
+  card.setAttribute('aria-expanded', open);
+  det.hidden = !open;
+  if(open) track(shown[+card.dataset.i], 'dettagli');
+}
+outEl.addEventListener('click', ev=>{
+  const a = ev.target.closest('a.act, a[data-act]');
+  const card = ev.target.closest('.ev');
+  if(!card) return;
+  if(a){ track(shown[+card.dataset.i], a.dataset.act, a.href); return; }
+  if(window.getSelection && String(window.getSelection()).length) return;
+  toggle(card);
+});
+outEl.addEventListener('keydown', ev=>{
+  if((ev.key==='Enter'||ev.key===' ') && ev.target.classList && ev.target.classList.contains('ev')){ ev.preventDefault(); toggle(ev.target); }
+});
+
+fetch(FEED).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{
+  if(!j || !Array.isArray(j.eventi) || !j.eventi.length) return;
+  EV = j.eventi.map(x=>({id:x.id, t:x.titolo, c:CATKEY[(x.categoria||'').toLowerCase()]||'cultura', l:x.luogo, co:x.comune,
+    z:x.zona, s:d(x.inizio), e:d(x.fine||x.inizio), o:x.orari, n:x.nota, u:((x.link||'').match(/https?:\/\/[^\s·]+/)||[''])[0], cf:!!x.daConfermare, cm:x.cosaManca||'', img:/^https?:\/\//.test(x.locandina||'')?x.locandina:'', sg:!!x.segnalato}));
+  const [g,o]=(j.aggiornato||'').split('T');
+  if(g){const dt=d(g);document.querySelector('.note .wrap').textContent='Eventi aggiornati al '+fmtG.format(dt)+(o?' alle '+o:'');}
+  buildCats(); state.cats.clear(); render();
+}).catch(()=>{document.querySelector('.note .wrap').textContent='Eventi non raggiungibili in questo momento: riprova tra qualche minuto.';document.getElementById('out').innerHTML='<p class="empty">Non riusciamo a caricare gli eventi. Riprova tra qualche minuto.</p>'});
+
+// Tendine per il telefono, sincronizzate con le pillole
+(function(){
+  const sw=document.getElementById('s-win'), sc=document.getElementById('s-cat'), sz=document.getElementById('s-zona');
+  Object.entries(CAT).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.nome;sc.appendChild(o)});
+  ZONE.forEach((z,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=z;sz.appendChild(o)});
+  const mark=()=>{sw.classList.toggle('on',sw.value!=='weekend');sc.classList.toggle('on',!!sc.value);sz.classList.toggle('on',sz.value!=='0')};
+  sw.onchange=()=>{document.getElementById('w-'+sw.value).click();mark()};
+  sc.onchange=()=>{state.cats.clear();if(sc.value)state.cats.add(sc.value);
+    document.querySelectorAll('#cats .pill').forEach(p=>p.setAttribute('aria-pressed',p.id==='c-'+sc.value));render();mark()};
+  sz.onchange=()=>{document.getElementById('z-'+sz.value).click();mark()};
+  mark();
+})();
+</script>
+<style>.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}</style>
+
+</body>
+</html>
