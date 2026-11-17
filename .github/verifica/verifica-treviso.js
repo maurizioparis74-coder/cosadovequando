@@ -61,7 +61,8 @@
     zOk = zOk && summaryN() === atteso2; zDet.push(`${z} ${summaryN()}`);
   }
   await click($('#z-0')); zOk = zOk && summaryN() === inRange();
-  ok('F8 Zone', zOk, zDet.join(' · '));
+  const fuoriZona = [...new Set(EV.filter(e => !ZONE.includes(e.z)).map(e => e.z))];
+  ok('F8 Zone', zOk && !fuoriZona.length, zDet.join(' · ') + (fuoriZona.length ? ' · zone sconosciute: ' + fuoriZona.join(', ') : ''));
 
   // F9 ricerca
   const q = $('#q'); const comune = cards().at(-1).querySelector('.meta b').textContent;
