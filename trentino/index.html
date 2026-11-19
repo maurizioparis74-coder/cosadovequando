@@ -15,17 +15,17 @@
 :root{
   --corallo:#C8452A; --corallo-scuro:#A8371F; --crema:#FFF4E6; --giallo:#F6C343; --scuro:#2A1712;
   --bg:#FFFAF3; --card:#FFFFFF; --fg:#2A1712; --muted:#7A5C52; --line:#EEDFD0; --chip:#F7E9DA;
-  --sagre:#C98A0C; --cultura:#3B6FB6; --concerti:#7A4BC9; --natura:#3E8A6E; --benessere:#12707A;
+  --sagre:#C98A0C; --cultura:#3B6FB6; --concerti:#7A4BC9; --natura:#3E8A6E; --benessere:#12707A; --corsi:#B23A72;
   --display:'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
   /* testo: carattere di sistema (San Francisco su iPhone, Roboto su Android): più leggibile sul telefono e senza lo zero barrato */
   --body:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#1D1210; --card:#2A1B17; --fg:#FFF4E6; --muted:#C9AFA4; --line:#3D2A24; --chip:#3A2721;
-  --sagre:#F0B53A; --cultura:#7FA6E0; --concerti:#B394EA; --natura:#6FC2A0; --benessere:#5FB8C0; --corallo-scuro:#E07A60; color-scheme:dark}}
+  --sagre:#F0B53A; --cultura:#7FA6E0; --concerti:#B394EA; --natura:#6FC2A0; --benessere:#5FB8C0; --corsi:#E68BB5; --corallo-scuro:#E07A60; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#1D1210; --card:#2A1B17; --fg:#FFF4E6; --muted:#C9AFA4; --line:#3D2A24; --chip:#3A2721;
-  --sagre:#F0B53A; --cultura:#7FA6E0; --concerti:#B394EA; --natura:#6FC2A0; --benessere:#5FB8C0; --corallo-scuro:#E07A60; color-scheme:dark}
+  --sagre:#F0B53A; --cultura:#7FA6E0; --concerti:#B394EA; --natura:#6FC2A0; --benessere:#5FB8C0; --corsi:#E68BB5; --corallo-scuro:#E07A60; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5}
 .wrap{max-width:860px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
@@ -193,7 +193,8 @@ const CAT = {
   cultura:{nome:'Cultura e mostre', col:'--cultura'},
   concerti:{nome:'Concerti e serate', col:'--concerti'},
   natura:{nome:'Natura e aria aperta', col:'--natura'},
-  benessere:{nome:'Eventi benessere', col:'--benessere'}
+  benessere:{nome:'Eventi benessere', col:'--benessere'},
+  corsi:{nome:'Corsi e workshop', col:'--corsi'}
 };
 const ZONE = ['Trento','Rovereto e Vallagarina','Garda','Valsugana','Valli e montagna'];
 // [titolo, categoria, luogo, comune, zona, inizio, fine, orari, nota, link]
@@ -232,7 +233,7 @@ let EV = [
 
 // Feed in tempo reale dal foglio (script «Pubblica»). Se non è raggiungibile restano gli eventi qui sopra.
 const FEED = 'https://script.google.com/macros/s/AKfycbxEksOq1c2qYgumxE-w7qQR-7aNdT56V29dovnlKqs7h3BnMgxw0MspzhJagWXKqGoTFA/exec';
-const CATKEY = {'sagre e feste':'sagre','cultura e mostre':'cultura','concerti e serate':'concerti','natura e sport':'natura','natura e aria aperta':'natura','benessere e corsi':'benessere','eventi benessere':'benessere','benessere':'benessere'};
+const CATKEY = {'sagre e feste':'sagre','cultura e mostre':'cultura','concerti e serate':'concerti','natura e sport':'natura','natura e aria aperta':'natura','benessere e corsi':'benessere','eventi benessere':'benessere','benessere':'benessere','corsi e workshop':'corsi','corsi':'corsi','workshop':'corsi'};
 
 function d(s){const [y,m,g]=s.split('-').map(Number);return new Date(y,m-1,g,12)}
 function iso(x){return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
