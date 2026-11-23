@@ -306,6 +306,7 @@ function calUrl(e){
 // Statistiche anonime: nessun dato personale, nessun cookie. Ogni azione diventa una riga nel foglio "Click".
 function track(e, azione, dest){
   if(!e || !e.id) return;
+  try{ if(localStorage.getItem('cdq-noconta')==='1') return; }catch(_){} // dispositivi nostri esclusi (?noconta)
   try{
     const body = JSON.stringify({t:'trentino', id:e.id, titolo:e.t, azione:azione, dest:dest||'', vista:state.win});
     if(navigator.sendBeacon) navigator.sendBeacon(FEED, new Blob([body],{type:'text/plain;charset=utf-8'}));
